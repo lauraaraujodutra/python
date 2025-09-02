@@ -1,354 +1,123 @@
 import flet as ft
 
 def main(page: ft.Page):
-    page.title = "App Multi-página"
-    page.padding = 0
-    page.scroll = ft.ScrollMode.AUTO
-    
-    # Estado global - controla qual página está sendo exibida
-    pagina_atual = "home"
-    
-    # Dados simulados do usuário
-    dados_usuario = {
-        "nome": "Estudante Flet",
-        "nivel": "Iniciante",
-        "pontos": 150,
-        "configuracoes": {
-            "modo_escuro": False,
-            "notificacoes": True,
-            "som": True
-        }
-    }
-    
-    def mudar_pagina(nova_pagina):
-        """Função para navegar entre páginas"""
-        nonlocal pagina_atual
-        pagina_atual = nova_pagina
-        
-        # Escondendo todas as páginas
-        conteudo_home.visible = False
-        conteudo_perfil.visible = False
-        conteudo_config.visible = False
-        conteudo_sobre.visible = False
-        
-        # Mostrando apenas a página selecionada
-        if pagina_atual == "home":
-            conteudo_home.visible = True
-        elif pagina_atual == "perfil":
-            conteudo_perfil.visible = True
-        elif pagina_atual == "config":
-            conteudo_config.visible = True
-        elif pagina_atual == "sobre":
-            conteudo_sobre.visible = True
-        
-        # Atualizando as cores dos ícones na barra inferior
-        atualizar_barra_navegacao()
+    # Configurações iniciais
+    page.title = "🛍️ Loja Virtual Mini"
+    page.bgcolor = ft.Colors.GREY_100
+    page.scroll = ft.ScrollMode.ADAPTIVE
+    page.padding = 25
+
+    carrinho, total_carrinho = [], 0.0
+
+    # Área de produtos
+    area_produtos = ft.GridView(expand=1, runs_count=2, max_extent=200,
+                                spacing=15, run_spacing=15, child_aspect_ratio=0.9)
+
+    # Elementos do carrinho
+    contador_carrinho = ft.Text("Carrinho (0)", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_800)
+    total_texto = ft.Text("Total: R$ 0,00", size=18, weight=ft.FontWeight.BOLD, color=ft.Colors.RED_700)
+    lista_carrinho = ft.ListView(height=180, spacing=8)
+    notificacao = ft.Text("", size=14, text_align=ft.TextAlign.CENTER, color=ft.Colors.BLUE_700)
+
+    def mostrar_notificacao(msg, cor=ft.Colors.BLUE_700):
+        notificacao.value, notificacao.color = msg, cor
         page.update()
-    
-    # Funções de navegação
-    def ir_home(e): mudar_pagina("home")
-    def ir_perfil(e): mudar_pagina("perfil")
-    def ir_config(e): mudar_pagina("config")
-    def ir_sobre(e): mudar_pagina("sobre")
-    
-    # Cabeçalho simples (sem navegação)
-    cabecalho = ft.Container(
-        content=ft.Container(
-            content=ft.Text(
-                "Meu App",
-                size=20,
-                weight=ft.FontWeight.BOLD,
-                color=ft.Colors.WHITE
-            ),
-            padding=ft.padding.only(top=20)  # Aqui é o padding top só no texto
-        ),
-        bgcolor=ft.Colors.BLUE,
-        padding=20,
-        alignment=ft.alignment.center
-    )
-    
-    # Criando os containers de navegação com destaque
-    def criar_item_navegacao(icone, label, pagina_nome, on_click_func):
-        """Cria um item de navegação com efeito hover"""
-        return ft.GestureDetector(
-            content=ft.Container(
-                content=ft.Column(
-                    controls=[
-                        ft.Icon(icone, size=24, color=ft.Colors.GREY),
-                        ft.Text(label, size=10, text_align=ft.TextAlign.CENTER, color=ft.Colors.GREY)
-                    ],
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    spacing=4
-                ),
-                padding=ft.padding.symmetric(vertical=8, horizontal=16),
-                border_radius=12,
-                bgcolor=ft.Colors.TRANSPARENT,
-                animate=ft.animation.Animation(200, ft.AnimationCurve.EASE_OUT)
-            ),
-            on_tap=on_click_func
-        )
-    
-    # Criando os itens de navegação
-    item_home = criar_item_navegacao(ft.Icons.HOME, "Início", "home", ir_home)
-    item_perfil = criar_item_navegacao(ft.Icons.PERSON, "Perfil", "perfil", ir_perfil)
-    item_config = criar_item_navegacao(ft.Icons.SETTINGS, "Config", "config", ir_config)
-    item_sobre = criar_item_navegacao(ft.Icons.INFO, "Sobre", "sobre", ir_sobre)
-    
-    def atualizar_barra_navegacao():
-        """Atualiza o destaque dos itens baseado na página atual"""
-        # Lista de todos os itens
-        itens = [
-            (item_home, "home"),
-            (item_perfil, "perfil"),
-            (item_config, "config"),
-            (item_sobre, "sobre")
-        ]
-        
-        for item, pagina_nome in itens:
-            container = item.content
-            icone = container.content.controls[0]
-            texto = container.content.controls[1]
-            
-            if pagina_atual == pagina_nome:
-                # Item ativo - destaque
-                container.bgcolor = ft.Colors.BLUE_50
-                container.border = ft.border.all(2, ft.Colors.BLUE_200)
-                icone.color = ft.Colors.BLUE
-                texto.color = ft.Colors.BLUE
-                texto.weight = ft.FontWeight.BOLD
-            else:
-                # Item inativo
-                container.bgcolor = ft.Colors.TRANSPARENT
-                container.border = None
-                icone.color = ft.Colors.GREY
-                texto.color = ft.Colors.GREY
-                texto.weight = ft.FontWeight.NORMAL
-    
-    # Barra de navegação inferior (estilo celular moderno)
-    barra_navegacao_inferior = ft.Container(
-        content=ft.Row(
-            controls=[item_home, item_perfil, item_config, item_sobre],
-            alignment=ft.MainAxisAlignment.SPACE_AROUND,
-            vertical_alignment=ft.CrossAxisAlignment.CENTER
-        ),
-        bgcolor=ft.Colors.WHITE,
-        padding=ft.padding.only(top=12, bottom=20),  # Bottom maior para área segura
-        border=ft.border.only(top=ft.border.BorderSide(1, ft.Colors.GREY_300)),
-        shadow=ft.BoxShadow(
-            spread_radius=0,
-            blur_radius=10,
-            color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK),
-            offset=ft.Offset(0, -2)
-        )
-    )
-    
-    # PÁGINA HOME
-    conteudo_home = ft.Container(
-        content=ft.Column(
-            controls=[
-                ft.Icon(ft.Icons.HOME, size=80, color=ft.Colors.BLUE),
-                ft.Text("Bem-vindo ao App! 🎉", size=28, weight=ft.FontWeight.BOLD),
-                ft.Text("Navegue pelas páginas usando a barra inferior", size=16, text_align=ft.TextAlign.CENTER),
-                ft.Container(height=20),
-                ft.Text("🎯 Toque nos ícones da barra para navegar!", size=14, color=ft.Colors.BLUE_600)
-            ],
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=15
-        ),
-        padding=40,
-        visible=True  # Página inicial visível
-    )
-    
-    # PÁGINA PERFIL
-    def adicionar_pontos(e):
-        dados_usuario["pontos"] += 10
-        texto_pontos.value = f"Pontos: {dados_usuario['pontos']} ⭐"
+
+    def atualizar_carrinho():
+        nonlocal total_carrinho
+        contador_carrinho.value = f"Carrinho ({len(carrinho)})"
+        total_texto.value = f"Total: R$ {total_carrinho:.2f}"
+        lista_carrinho.controls.clear()
+
+        for i, item in enumerate(carrinho):
+            lista_carrinho.controls.append(
+                ft.Row([
+                    ft.Text(item["nome"], expand=True, size=14),
+                    ft.Text(f"R$ {item['preco']:.2f}", color=ft.Colors.GREEN_600, size=14),
+                    ft.IconButton(ft.icons.DELETE, icon_color=ft.Colors.RED, tooltip="Remover",
+                                  on_click=lambda e, idx=i: remover_do_carrinho(idx))
+                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
+            )
         page.update()
-    
-    texto_pontos = ft.Text(f"Pontos: {dados_usuario['pontos']} ⭐", size=16)
-    
-    conteudo_perfil = ft.Container(
-        content=ft.Column(
-            controls=[
-                ft.CircleAvatar(
-                    content=ft.Icon(ft.Icons.PERSON, size=50, color=ft.Colors.WHITE),
-                    bgcolor=ft.Colors.BLUE,
-                    radius=60
-                ),
-                ft.Text(dados_usuario["nome"], size=24, weight=ft.FontWeight.BOLD),
-                ft.Text(f"Nível: {dados_usuario['nivel']}", size=16, color=ft.Colors.BLUE_600),
-                texto_pontos,
-                ft.Container(height=20),
-                ft.ElevatedButton(
-                    "Ganhar Pontos! 🎯",
-                    on_click=adicionar_pontos,
-                    bgcolor=ft.Colors.GREEN,
-                    color=ft.Colors.WHITE
-                )
-            ],
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=15
-        ),
-        padding=40,
-        visible=False
-    )
-    
-    # PÁGINA CONFIGURAÇÕES
-    def alternar_modo_escuro(e):
-        dados_usuario["configuracoes"]["modo_escuro"] = e.control.value
-        # Aqui poderia implementar mudança real de tema
-        
-    def alternar_notificacoes(e):
-        dados_usuario["configuracoes"]["notificacoes"] = e.control.value
-        
-    def alternar_som(e):
-        dados_usuario["configuracoes"]["som"] = e.control.value
-    
-    conteudo_config = ft.Container(
-        content=ft.Column(
-            controls=[
-                ft.Icon(ft.Icons.SETTINGS, size=60, color=ft.Colors.BLUE),
-                ft.Text("Configurações ⚙️", size=24, weight=ft.FontWeight.BOLD),
-                ft.Container(height=20),
-                ft.Switch(
-                    label="Modo escuro",
-                    value=dados_usuario["configuracoes"]["modo_escuro"],
-                    on_change=alternar_modo_escuro
-                ),
-                ft.Switch(
-                    label="Notificações",
-                    value=dados_usuario["configuracoes"]["notificacoes"],
-                    on_change=alternar_notificacoes
-                ),
-                ft.Container(height=30)
-            ],
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=15
-        ),
-        padding=40,
-        visible=False
-    )
-    
-    # PÁGINA SOBRE
-    conteudo_sobre = ft.Container(
-        content=ft.Column(
-            controls=[
-                ft.Icon(ft.Icons.INFO, size=60, color=ft.Colors.BLUE),
-                ft.Text("Sobre o App ℹ️", size=24, weight=ft.FontWeight.BOLD),
-                ft.Container(height=20),
-                ft.Text("Versão: 1.0.0", size=16),
-                ft.Text("Desenvolvido com Flet", size=16),
-                ft.Text("Python + Interface Mobile", size=16),
-                ft.Container(height=20),
-                ft.Text(
-                    "Este app demonstra navegação entre páginas, "
-                    "gerenciamento de estado e interface completa!",
-                    size=14,
-                    text_align=ft.TextAlign.CENTER,
-                    color=ft.Colors.GREY_600
-                ),
-                ft.Container(height=30)
-            ],
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=15
-        ),
-        padding=40,
-        visible=False
-    )
-    
-    # Montando a estrutura principal
-    conteudo_principal = ft.Container(
-        content=ft.Column(
-            controls=[
-                cabecalho,
-                ft.Container(
-                    content=ft.Stack(  # Stack permite sobrepor elementos
-                        controls=[
-                            conteudo_home,
-                            conteudo_perfil,
-                            conteudo_config,
-                            conteudo_sobre
-                        ]
-                    ),
-                    expand=True,
-                    padding=ft.padding.only(bottom=90)  # Espaço para a barra
-                )
-            ],
-            spacing=0
-        ),
-        expand=True
-    )
-    
-    # Barra de navegação como container separado
-    barra_fixa = ft.Container(
-        content=ft.Row(
-            controls=[item_home, item_perfil, item_config, item_sobre],
-            alignment=ft.MainAxisAlignment.SPACE_AROUND,
-            vertical_alignment=ft.CrossAxisAlignment.CENTER
-        ),
-        bgcolor=ft.Colors.WHITE,
-        padding=ft.padding.only(top=12, bottom=25),
-        border=ft.border.only(top=ft.border.BorderSide(1, ft.Colors.GREY_300)),
-        shadow=ft.BoxShadow(
-            spread_radius=0,
-            blur_radius=10,
-            color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK),
-            offset=ft.Offset(0, -2)
-        ),
-        height=80
-    )
-    
-    # Estrutura com controle manual de altura
+
+    def adicionar_ao_carrinho(nome, preco):
+        nonlocal total_carrinho
+        carrinho.append({"nome": nome, "preco": preco})
+        total_carrinho += preco
+        atualizar_carrinho()
+        mostrar_notificacao(f"✅ {nome} adicionado ao carrinho!", ft.Colors.GREEN_700)
+
+    def remover_do_carrinho(idx):
+        nonlocal total_carrinho
+        if 0 <= idx < len(carrinho):
+            produto = carrinho.pop(idx)
+            total_carrinho -= produto["preco"]
+            atualizar_carrinho()
+            mostrar_notificacao(f"❌ {produto['nome']} removido!", ft.Colors.RED_700)
+
+    def finalizar_compra(e):
+        nonlocal total_carrinho
+        if carrinho:
+            carrinho.clear()
+            total_carrinho = 0.0
+            atualizar_carrinho()
+            mostrar_notificacao("🎉 Compra finalizada com sucesso!", ft.Colors.BLUE_800)
+        else:
+            mostrar_notificacao("⚠️ Carrinho vazio!", ft.Colors.ORANGE)
+
+    def criar_card(nome, preco, emoji, cor):
+        return ft.Container(
+            content=ft.Column([
+                ft.Text(emoji, size=40, text_align=ft.TextAlign.CENTER),
+                ft.Text(nome, size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE, text_align=ft.TextAlign.CENTER),
+                ft.Text(f"R$ {preco:.2f}", size=14, color=ft.Colors.WHITE70, text_align=ft.TextAlign.CENTER)
+            ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=10),
+            bgcolor=cor,
+            padding=15,
+            border_radius=15,
+            shadow=ft.BoxShadow(blur_radius=10, spread_radius=1, color=ft.Colors.with_opacity(0.3, ft.Colors.BLACK)),
+            on_click=lambda e: adicionar_ao_carrinho(nome, preco),
+            ink=True,
+            animate=ft.Animation(300, ft.AnimationCurve.EASE_OUT),
+            width=180,
+            height=190
+        )
+
+    produtos = [
+        {"nome": "Smartphone", "preco": 899.99, "emoji": "📱", "cor": ft.Colors.BLUE_600},
+        {"nome": "Notebook", "preco": 2499.90, "emoji": "💻", "cor": ft.Colors.RED_600},
+        {"nome": "Tênis", "preco": 299.99, "emoji": "👟", "cor": ft.Colors.BLUE_700},
+        {"nome": "Camiseta", "preco": 89.90, "emoji": "👕", "cor": ft.Colors.RED_700},
+        {"nome": "Livro", "preco": 45.00, "emoji": "📚", "cor": ft.Colors.BLUE_500},
+        {"nome": "Fone", "preco": 199.99, "emoji": "🎧", "cor": ft.Colors.RED_500},
+    ]
+
+    for p in produtos:
+        area_produtos.controls.append(criar_card(p["nome"], p["preco"], p["emoji"], p["cor"]))
+
+    # Layout da página
     page.add(
-        ft.Container(
-            content=ft.Column(
-                controls=[
-                    # Conteúdo principal com altura calculada
-                    ft.Container(
-                        content=ft.Column(
-                            controls=[
-                                cabecalho,
-                                ft.Stack(
-                                    controls=[
-                                        conteudo_home,
-                                        conteudo_perfil,
-                                        conteudo_config,
-                                        conteudo_sobre
-                                    ]
-                                )
-                            ],
-                            spacing=0
-                        ),
-                        height=500,  # Altura fixa - AJUSTE ESTE VALOR para controlar a posição da barra
-                        # Valores sugeridos:
-                        # 700 = barra mais no final
-                        # 650 = barra no meio-final  
-                        # 600 = barra no meio
-                        # 550 = barra no meio-topo
-                        # 500 = barra mais no topo
-                    ),
-                    # Barra de navegação
-                    ft.Container(
-                        content=ft.Row(
-                            controls=[item_home, item_perfil, item_config, item_sobre],
-                            alignment=ft.MainAxisAlignment.SPACE_AROUND,
-                            vertical_alignment=ft.CrossAxisAlignment.CENTER
-                        ),
-                        bgcolor=ft.Colors.WHITE,
-                        padding=ft.padding.only(top=12, bottom=25),
-                        border=ft.border.only(top=ft.border.BorderSide(1, ft.Colors.GREY_300)),
-                        shadow=ft.BoxShadow(
-                            spread_radius=0,
-                            blur_radius=10,
-                            color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK),
-                            offset=ft.Offset(0, -2)
-                        )
-                    )
-                ],
-                spacing=0
-            ),
-            expand=True
-        )
+        ft.Column([
+            ft.Text("🛍️ Loja Virtual Mini", size=30, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_800),
+            ft.Text("Escolha seus produtos favoritos!", size=16, color=ft.Colors.GREY_700),
+            ft.Container(content=area_produtos, padding=10, border_radius=12, bgcolor=ft.Colors.WHITE),
+            ft.Divider(height=20, color=ft.Colors.GREY_300),
+            ft.Container(
+                content=ft.Column([
+                    ft.Row([contador_carrinho, total_texto], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+                    lista_carrinho,
+                    ft.Row([
+                        ft.ElevatedButton("🛒 Finalizar Compra", on_click=finalizar_compra,
+                                          bgcolor=ft.Colors.RED_600, color=ft.Colors.WHITE, width=220)
+                    ], alignment=ft.MainAxisAlignment.CENTER),
+                    notificacao
+                ], spacing=15),
+                padding=20,
+                border_radius=12,
+                bgcolor=ft.Colors.WHITE,
+                shadow=ft.BoxShadow(blur_radius=8, spread_radius=1, color=ft.Colors.with_opacity(0.15, ft.Colors.BLACK))
+            )
+        ], spacing=20, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
     )
 
 ft.app(target=main)
