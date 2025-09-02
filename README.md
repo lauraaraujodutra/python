@@ -37,20 +37,6 @@ Cada arquivo representa um exercício ou desafio diferente, ajudando a explorar 
 
 ---
 
-## 📂 Estrutura dos Projetos
-
-- **1_primeiro_app.py** → Primeiro app com Flet 🎉  
-- **2_botao_simples.py** → Exemplo de botão interativo 👇  
-- **3_campo_texto.py** → Campo de texto e entrada de dados ✍️  
-- **4_lista_cores.py** → Lista colorida e estilização 🎨  
-- **5_layout_basico.py** → Layouts e organização da interface 📐  
-- **5a_desafio1.py** → Desafio com múltiplos elementos 👾  
-- **7_calculadora.py** → Mini calculadora interativa 🧮  
-- **8_painel_conf.py** → Painel de configurações dinâmico ⚙️  
-- **9_galeria_cards.py** → Galeria com cards e filtros de animais 🦁🐱🐶  
-
----
-
 ## 🖼️ Prints dos Projetos
 
 ### 🤳🏻 1 - Primeiro App
@@ -125,13 +111,22 @@ Este código cria um aplicativo de galeria interativa de animais usando Flet, on
 ---
 
 ### 🐾 10 - App
-Este código cria um aplicativo de galeria interativa de animais usando Flet, onde cada animal é representado por um card colorido com emoji, nome e descrição. A interface permite que o usuário filtre os animais por categoria, tamanho e também busque por nome em um campo de texto. Conforme os filtros ou a busca são alterados, os cards visíveis são atualizados dinamicamente, e um contador mostra quantos animais estão sendo exibidos. Há ainda um botão para limpar os filtros, retornando a visualização para todos os animais. O layout utiliza colunas, linhas e uma grade para organizar os cards, com sombras, bordas arredondadas e cores distintas para criar um visual moderno e amigável.
+O app é uma interface multi-página desenvolvida com Flet, organizada em quatro seções principais: Home, Perfil, Configurações e Sobre. A navegação é feita por uma barra inferior fixa, com ícones que destacam a página ativa, enquanto o conteúdo de cada página é gerenciado por um Stack, mostrando apenas a seção selecionada. A página Home exibe mensagens de boas-vindas, Perfil mostra informações do usuário e permite acumular pontos, Configurações oferece switches para personalizar preferências como modo escuro e notificações, e Sobre apresenta informações do app. Todo o layout é estruturado com Column e Container, utilizando cores consistentes, sombras, espaçamentos e animações suaves nos itens de navegação para criar uma experiência visual moderna e intuitiva.
 
-
+<img width="741" height="992" alt="Captura de tela 2025-09-02 115321" src="https://github.com/user-attachments/assets/fb8a30ff-9759-4a17-80dd-cf3d5b575978" />
 
 ---
 
+### 🐾 10a - Desafio - Loja virtual
+Esse código implementa uma Loja Virtual Mini em Python usando o Flet.
+A tela é dividida em três partes principais:
+- Produtos em grade (GridView): cada item aparece como um card colorido, com emoji, nome e preço, e ao clicar o produto é adicionado ao carrinho.
+- Filtros e busca: o usuário pode filtrar por categoria, faixa de preço e também buscar por nome, com atualização dinâmica da grade de produtos.
+- Carrinho de compras: mostra os itens adicionados, o valor total, botão para remover produtos individualmente e outro para finalizar a compra, zerando o carrinho.
 
+<img width="733" height="987" alt="Captura de tela 2025-09-02 133033" src="https://github.com/user-attachments/assets/911f75c6-158e-4099-bb64-ff381cef8631" />
+
+---
 
 ## 🔧 Tecnologias Utilizadas
 - [Python](https://www.python.org/) 🐍
